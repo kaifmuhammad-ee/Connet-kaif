@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     }
 
     // Insert enquiry using Supabase JS client
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("enquiries")
       .insert([
         {
@@ -42,8 +42,7 @@ export async function POST(request: Request) {
           message,
           status: "New",
         },
-      ])
-      .select();
+      ]);
 
     if (error) {
       console.error("Supabase insert error details:", error);
@@ -54,7 +53,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { success: true, enquiry: data ? data[0] : null },
+      { success: true, enquiry: null },
       { status: 201 }
     );
   } catch (error: any) {
