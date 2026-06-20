@@ -37,7 +37,7 @@ export default function AdminLogin() {
       } else {
         setError(data.error || "Invalid email or password.");
       }
-    } catch (err) {
+    } catch (_err) {
       setError("An error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -50,7 +50,7 @@ export default function AdminLogin() {
       <div className="flex justify-between items-center w-full max-w-6xl mx-auto">
         <button 
           onClick={() => router.push("/")}
-          className="font-serif text-lg font-bold tracking-tight hover:italic"
+          className="font-heading text-lg font-black tracking-tight uppercase"
         >
           Kaif Muhammad
         </button>
@@ -65,7 +65,7 @@ export default function AdminLogin() {
           <div className="w-12 h-12 border border-black rounded-none flex items-center justify-center mx-auto mb-4 bg-black text-[#F5F0E6]">
             <Lock size={18} />
           </div>
-          <h1 className="font-serif text-3xl tracking-tight">Admin Login</h1>
+          <h1 className="font-heading font-black text-3xl tracking-tight uppercase">Admin Login</h1>
           <p className="text-xs uppercase tracking-wider text-black/50 mt-2">
             Enter credentials to manage enquiries
           </p>

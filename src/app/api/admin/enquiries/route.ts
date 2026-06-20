@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { query } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 import { decrypt } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -16,17 +16,23 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 2. Fetch enquiries from database
-    const sql = `
-      SELECT id, category, name, email, phone, place, message, status, created_at
-      FROM enquiries
-      ORDER BY created_at DESC;
-    `;
-    const result = await query(sql);
+    // 2. Fetch enquiries from database via Supabase client
+    const { data, error } = await supabase
+      .from("enquiries")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-    return NextResponse.json({ success: true, enquiries: result.rows });
+    if (error) {
+      console.error("Supabase select error details:", error);
+      return NextResponse.json(
+        { error: `Database fetch failed: ${error.message || JSON.stringify(error)}` },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, enquiries: data || [] });
   } catch (error: any) {
-    console.error("Error in GET /api/admin/enquiries:", error);
+    console.error("Unexpected error in GET /api/admin/enquiries:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

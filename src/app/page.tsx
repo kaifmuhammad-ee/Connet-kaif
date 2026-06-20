@@ -8,7 +8,7 @@ const VENTURES = [
   {
     name: "Zee Chai",
     description: "Premium chai lounges bringing a modern, warm tea experience.",
-    url: "https://zeechai.com", // Example URL
+    url: "https://zeechai.in",
   },
   {
     name: "ZeeSip",
@@ -28,15 +28,21 @@ const VENTURES = [
   {
     name: "Le Weekend",
     description: "Curated weekend getaways, boutique travel, and experiences.",
-    url: "https://leweekend.com",
+    url: "https://leweekend.in",
   },
 ];
 
-const CATEGORIES = ["ZeeSip", "Zee Chai", "Eallisto", "General"];
+const CATEGORIES = [
+  "ZeeSip", 
+  "Zee Chai", 
+  "Eallisto", 
+  "Le Weekend", 
+  "Kinford School", 
+  "General"
+];
 
 export default function Home() {
   const [showNavbar, setShowNavbar] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [category, setCategory] = useState("");
   const [formData, setFormData] = useState({
     name: "",
@@ -108,7 +114,6 @@ export default function Home() {
     setIsSubmitting(true);
 
     try {
-      // Connect to API route
       const response = await fetch("/api/enquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -117,6 +122,8 @@ export default function Home() {
           ...formData,
         }),
       });
+
+      const result = await response.json();
 
       if (response.ok) {
         setIsSuccess(true);
@@ -129,7 +136,7 @@ export default function Home() {
         });
         setCategory("");
       } else {
-        setErrors({ submit: "Something went wrong. Please try again." });
+        setErrors({ submit: result.error || "Something went wrong. Please try again." });
       }
     } catch (err) {
       setErrors({ submit: "Network error. Please check your connection and try again." });
@@ -139,7 +146,6 @@ export default function Home() {
   };
 
   const scrollToSection = (id: string) => {
-    setMobileMenuOpen(false);
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
@@ -155,9 +161,8 @@ export default function Home() {
         id="home"
         className="min-h-screen flex flex-col justify-between px-6 py-12 md:px-24 md:py-20 relative z-10"
       >
-        <div className="flex justify-between items-start">
-          <span className="font-serif text-lg tracking-wider font-semibold">K.M.</span>
-          <span className="text-xs uppercase tracking-[0.2em] border border-black px-3 py-1">
+        <div className="flex justify-end items-start w-full">
+          <span className="text-xs uppercase tracking-[0.2em] border border-black px-3 py-1 font-semibold">
             Personal Hub
           </span>
         </div>
@@ -168,7 +173,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="font-serif text-6xl sm:text-7xl md:text-9xl tracking-tight leading-none mb-6">
+            <h1 className="font-heading font-black text-6xl sm:text-7xl md:text-9xl tracking-tighter leading-none mb-6 uppercase">
               Kaif Muhammad
             </h1>
           </motion.div>
@@ -182,7 +187,7 @@ export default function Home() {
             <p className="text-xs uppercase tracking-[0.3em] font-semibold bg-black text-[#F5F0E6] px-3 py-1 w-fit">
               Serial Entrepreneur
             </p>
-            <p className="font-serif text-xl sm:text-2xl text-black/80 italic">
+            <p className="font-heading text-lg sm:text-xl text-black/75 tracking-wide font-semibold">
               Building the future across hospitality, luxury, and education.
             </p>
           </motion.div>
@@ -196,100 +201,47 @@ export default function Home() {
             <p className="text-sm sm:text-base leading-relaxed text-black/70">
               My Instagram DMs are heavily backlogged. If you have a business proposal, 
               partnership opportunity, or inquiry for any of my ventures, please use the 
-              enquiry hub below. It feeds directly into my team's admin panel for a faster response.
+              enquiry hub below. It feeds directly into my team&apos;s admin panel for a faster response.
             </p>
           </motion.div>
         </div>
 
-        <div className="flex justify-between items-center text-xs uppercase tracking-[0.2em]">
+        <div className="flex justify-start items-center text-xs uppercase tracking-[0.2em]">
           <button 
             onClick={() => scrollToSection("about")}
-            className="hover:underline underline-offset-4 flex items-center gap-1 group"
+            className="hover:underline underline-offset-4 flex items-center gap-1 group font-semibold"
           >
             Scroll to explore <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
           </button>
-          <span>Est. 2024</span>
         </div>
       </section>
 
-      {/* 2. NAVBAR (Appears after hero, on scroll) */}
+      {/* 2. NAVBAR (Centered Floating Pill Style) */}
       <AnimatePresence>
         {showNavbar && (
           <motion.nav
-            initial={{ y: -100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -100, opacity: 0 }}
-            transition={{ duration: 0.4, ease: "easeInOut" }}
-            className="fixed top-0 left-0 w-full z-50 bg-[#F5F0E6]/95 backdrop-blur-md border-b border-black/10 px-6 py-4 md:px-24 flex justify-between items-center"
+            initial={{ y: -50, x: "-50%", opacity: 0 }}
+            animate={{ y: 0, x: "-50%", opacity: 1 }}
+            exit={{ y: -50, x: "-50%", opacity: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-black/95 backdrop-blur-md border border-[#F5F0E6]/15 px-8 py-4 rounded-full shadow-2xl flex items-center gap-6 sm:gap-8 text-[#F5F0E6] text-[10px] sm:text-xs uppercase tracking-[0.2em] font-semibold"
           >
-            <button 
-              onClick={() => scrollToSection("home")}
-              className="font-serif text-xl font-bold tracking-tight"
-            >
-              Kaif Muhammad
-            </button>
-
-            {/* Desktop Menu */}
-            <div className="hidden md:flex gap-8 text-xs uppercase tracking-[0.2em] font-medium">
-              <button onClick={() => scrollToSection("about")} className="hover:underline underline-offset-4">About</button>
-              <button onClick={() => scrollToSection("ventures")} className="hover:underline underline-offset-4">Ventures</button>
-              <button onClick={() => scrollToSection("enquire")} className="hover:underline underline-offset-4">Enquire</button>
-              <button onClick={() => scrollToSection("contact")} className="hover:underline underline-offset-4">Contact</button>
-            </div>
-
-            {/* Mobile Burger Button */}
-            <button
-              onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden p-1 border border-black/10 hover:border-black transition-colors"
-            >
-              <span className="text-xs uppercase tracking-wider font-semibold">Menu</span>
-            </button>
+            <button onClick={() => scrollToSection("about")} className="hover:text-white transition-colors">About</button>
+            <button onClick={() => scrollToSection("ventures")} className="hover:text-white transition-colors">Ventures</button>
+            <button onClick={() => scrollToSection("enquire")} className="hover:text-white transition-colors">Enquire</button>
+            <button onClick={() => scrollToSection("contact")} className="hover:text-white transition-colors">Contact</button>
           </motion.nav>
         )}
       </AnimatePresence>
 
-      {/* Mobile Fullscreen Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#F5F0E6] flex flex-col justify-between p-8"
-          >
-            <div className="flex justify-between items-center">
-              <span className="font-serif text-lg font-bold">K.M.</span>
-              <button
-                onClick={() => setMobileMenuOpen(false)}
-                className="border border-black px-4 py-2 text-xs uppercase tracking-wider font-semibold"
-              >
-                Close
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-8 my-auto text-4xl sm:text-5xl font-serif">
-              <button onClick={() => scrollToSection("about")} className="text-left hover:italic">About</button>
-              <button onClick={() => scrollToSection("ventures")} className="text-left hover:italic">Ventures</button>
-              <button onClick={() => scrollToSection("enquire")} className="text-left hover:italic">Enquire</button>
-              <button onClick={() => scrollToSection("contact")} className="text-left hover:italic">Contact</button>
-            </div>
-
-            <div className="flex justify-between text-xs uppercase tracking-widest text-black/60">
-              <span>kaif@gmail.com</span>
-              <span>© 2026</span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ABOUT SECTION (Extra block to connect About navigation link) */}
+      {/* ABOUT SECTION */}
       <section 
         id="about" 
         className="py-24 px-6 md:px-24 border-t border-black bg-black text-[#F5F0E6]"
       >
         <div className="max-w-4xl mx-auto">
-          <span className="text-xs uppercase tracking-[0.3em] opacity-60 block mb-6">01 / Biography</span>
-          <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl tracking-tight mb-8">
+          <span className="text-xs uppercase tracking-[0.3em] opacity-60 block mb-6 font-semibold">01 / Biography</span>
+          <h2 className="font-heading font-black text-4xl sm:text-5xl md:text-6xl tracking-tight mb-8">
             An editorial approach to multi-venture execution.
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm md:text-base opacity-80 leading-relaxed font-light">
@@ -315,8 +267,8 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-4">
             <div>
-              <span className="text-xs uppercase tracking-[0.3em] text-black/60 block mb-3">02 / Portfolio</span>
-              <h2 className="font-serif text-5xl md:text-6xl tracking-tight">Active Ventures</h2>
+              <span className="text-xs uppercase tracking-[0.3em] text-black/60 block mb-3 font-semibold">02 / Portfolio</span>
+              <h2 className="font-heading font-black text-5xl md:text-6xl tracking-tight">Active Ventures</h2>
             </div>
             <p className="text-sm text-black/60 max-w-sm">
               Click on any venture below to explore their official channels and websites.
@@ -333,7 +285,7 @@ export default function Home() {
                 className="group border border-black p-8 flex flex-col justify-between h-80 transition-all duration-500 hover:bg-black hover:text-[#F5F0E6] rounded-none relative overflow-hidden"
               >
                 <div className="flex justify-between items-start">
-                  <span className="font-serif text-3xl font-light tracking-tight group-hover:italic">
+                  <span className="font-heading text-2xl font-bold tracking-tight">
                     {item.name}
                   </span>
                   <div className="border border-black group-hover:border-[#F5F0E6] p-2 transition-colors">
@@ -362,8 +314,8 @@ export default function Home() {
       >
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-xs uppercase tracking-[0.3em] opacity-60 block mb-3">03 / Communication</span>
-            <h2 className="font-serif text-5xl md:text-6xl tracking-tight mb-4">Enquiry Hub</h2>
+            <span className="text-xs uppercase tracking-[0.3em] opacity-60 block mb-3 font-semibold">03 / Communication</span>
+            <h2 className="font-heading font-black text-5xl md:text-6xl tracking-tight mb-4">Enquiry Hub</h2>
             <p className="text-sm opacity-70 max-w-md mx-auto">
               Select the appropriate brand category below to submit a direct message to Kaif and his team.
             </p>
@@ -382,7 +334,7 @@ export default function Home() {
                 >
                   {/* Category Dropdown */}
                   <div className="space-y-3">
-                    <label htmlFor="category" className="block text-xs uppercase tracking-[0.2em] font-medium opacity-80">
+                    <label htmlFor="category" className="block text-xs uppercase tracking-[0.2em] font-semibold opacity-80">
                       Select Venture / Category <span className="text-red-500">*</span>
                     </label>
                     <select
@@ -416,7 +368,7 @@ export default function Home() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Name */}
                     <div className="space-y-2">
-                      <label htmlFor="name" className="block text-xs uppercase tracking-[0.2em] opacity-80">Name *</label>
+                      <label htmlFor="name" className="block text-xs uppercase tracking-[0.2em] font-semibold opacity-80">Name *</label>
                       <input
                         id="name"
                         type="text"
@@ -433,7 +385,7 @@ export default function Home() {
 
                     {/* Email */}
                     <div className="space-y-2">
-                      <label htmlFor="email" className="block text-xs uppercase tracking-[0.2em] opacity-80">Email *</label>
+                      <label htmlFor="email" className="block text-xs uppercase tracking-[0.2em] font-semibold opacity-80">Email *</label>
                       <input
                         id="email"
                         type="email"
@@ -450,7 +402,7 @@ export default function Home() {
 
                     {/* Phone */}
                     <div className="space-y-2">
-                      <label htmlFor="phone" className="block text-xs uppercase tracking-[0.2em] opacity-80">Phone Number *</label>
+                      <label htmlFor="phone" className="block text-xs uppercase tracking-[0.2em] font-semibold opacity-80">Phone Number *</label>
                       <input
                         id="phone"
                         type="tel"
@@ -467,7 +419,7 @@ export default function Home() {
 
                     {/* Place */}
                     <div className="space-y-2">
-                      <label htmlFor="place" className="block text-xs uppercase tracking-[0.2em] opacity-80">Place (City/Location) *</label>
+                      <label htmlFor="place" className="block text-xs uppercase tracking-[0.2em] font-semibold opacity-80">Place (City/Location) *</label>
                       <input
                         id="place"
                         type="text"
@@ -485,7 +437,7 @@ export default function Home() {
 
                   {/* Message */}
                   <div className="space-y-3">
-                    <label htmlFor="message" className="block text-xs uppercase tracking-[0.2em] opacity-80">Message *</label>
+                    <label htmlFor="message" className="block text-xs uppercase tracking-[0.2em] font-semibold opacity-80">Message *</label>
                     <textarea
                       id="message"
                       name="message"
@@ -501,7 +453,7 @@ export default function Home() {
                   </div>
 
                   {errors.submit && (
-                    <div className="p-4 border border-red-500 text-red-500 text-sm">
+                    <div className="p-4 border border-red-500 text-red-500 text-sm bg-red-500/5">
                       {errors.submit}
                     </div>
                   )}
@@ -526,14 +478,14 @@ export default function Home() {
                   <div className="w-16 h-16 bg-[#F5F0E6] text-black rounded-full flex items-center justify-center mx-auto">
                     <Check size={28} />
                   </div>
-                  <h3 className="font-serif text-3xl sm:text-4xl tracking-tight">Enquiry Received</h3>
+                  <h3 className="font-heading font-black text-3xl sm:text-4xl tracking-tight">Enquiry Received</h3>
                   <p className="text-sm opacity-70 max-w-md mx-auto leading-relaxed">
                     Thank you for reaching out. Your enquiry has been added to our dashboard. 
                     Kaif or a representative of the team will review the details and get back to you shortly.
                   </p>
                   <button
                     onClick={() => setIsSuccess(false)}
-                    className="border border-[#F5F0E6] px-8 py-3 text-xs uppercase tracking-widest text-[#F5F0E6] hover:bg-[#F5F0E6] hover:text-black transition-all duration-300 rounded-none"
+                    className="border border-[#F5F0E6] px-8 py-3 text-xs uppercase tracking-widest text-[#F5F0E6] hover:bg-[#F5F0E6] hover:text-black transition-all duration-300 rounded-none font-semibold"
                   >
                     Submit Another Enquiry
                   </button>
@@ -544,19 +496,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. SOCIALS/CONTACT BAR (Footer) */}
+      {/* 5. FOOTER / CONTACT SECTION (Simplified) */}
       <footer 
         id="contact" 
         className="py-16 px-6 md:px-24 border-t border-black bg-[#F5F0E6] text-black flex flex-col md:flex-row justify-between items-center gap-8"
       >
         <div className="text-center md:text-left">
-          <span className="font-serif text-2xl font-bold tracking-tight block">Kaif Muhammad</span>
-          <span className="text-xs uppercase tracking-[0.2em] text-black/50">© 2026. All Rights Reserved.</span>
+          <span className="font-heading text-xl font-bold tracking-tight block">Kaif Muhammad</span>
+          <span className="text-xs uppercase tracking-[0.2em] text-black/50 font-medium">© 2026. All Rights Reserved.</span>
         </div>
 
-        <div className="flex gap-8 text-xs uppercase tracking-[0.2em] font-semibold">
+        <div className="flex gap-8 text-xs uppercase tracking-[0.2em] font-bold">
           <a
-            href="https://instagram.com" // Example Instagram link
+            href="https://www.instagram.com/_kaif_muhammad/"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:underline underline-offset-4 flex items-center gap-1.5"
@@ -569,18 +521,7 @@ export default function Home() {
             </svg>
           </a>
           <a
-            href="https://wa.me/919876543210" // Example WhatsApp click-to-chat link
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline underline-offset-4 flex items-center gap-1.5"
-          >
-            WhatsApp 
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-            </svg>
-          </a>
-          <a
-            href="mailto:kaif@gmail.com"
+            href="mailto:kaifmuhammad.zee@gmail.com"
             className="hover:underline underline-offset-4 flex items-center gap-1.5"
           >
             Email 

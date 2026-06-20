@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { query } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 import { decrypt } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -32,22 +32,28 @@ export async function PATCH(
       );
     }
 
-    // 3. Update enquiry status
-    const sql = `
-      UPDATE enquiries
-      SET status = $1
-      WHERE id = $2
-      RETURNING *;
-    `;
-    const result = await query(sql, [status, id]);
+    // 3. Update enquiry status via Supabase client
+    const { data, error } = await supabase
+      .from("enquiries")
+      .update({ status })
+      .eq("id", id)
+      .select();
 
-    if (result.rowCount === 0) {
+    if (error) {
+      console.error("Supabase update error details:", error);
+      return NextResponse.json(
+        { error: `Database update failed: ${error.message || JSON.stringify(error)}` },
+        { status: 500 }
+      );
+    }
+
+    if (!data || data.length === 0) {
       return NextResponse.json({ error: "Enquiry not found." }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, enquiry: result.rows[0] });
+    return NextResponse.json({ success: true, enquiry: data[0] });
   } catch (error: any) {
-    console.error("Error in PATCH /api/admin/enquiries/[id]:", error);
+    console.error("Unexpected error in PATCH /api/admin/enquiries/[id]:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

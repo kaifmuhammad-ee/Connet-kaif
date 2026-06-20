@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit, Playfair_Display } from "next/font/google";
+import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -8,10 +8,10 @@ const outfit = Outfit({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const playfair = Playfair_Display({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-playfair",
-  weight: ["400", "600", "700"],
+  variable: "--font-inter",
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${outfit.variable} ${playfair.variable} font-sans antialiased bg-[#F5F0E6] text-black`}
+        className={`${outfit.variable} ${inter.variable} font-sans antialiased bg-[#F5F0E6] text-black`}
       >
         {children}
       </body>

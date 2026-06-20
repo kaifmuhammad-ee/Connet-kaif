@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, Filter, ChevronDown, RefreshCw, X, Calendar, MapPin, User, Mail, Phone, MessageSquare, Tag } from "lucide-react";
+import { LogOut, RefreshCw, X, Calendar, MapPin, Mail, Phone, Tag } from "lucide-react";
 
 interface Enquiry {
   id: string;
@@ -154,7 +154,7 @@ export default function AdminDashboard() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-black pb-8 gap-4">
           <div>
             <span className="text-xs uppercase tracking-[0.2em] opacity-60">Admin Portal</span>
-            <h1 className="font-serif text-4xl tracking-tight mt-1">Enquiries Hub</h1>
+            <h1 className="font-heading font-black text-4xl tracking-tight mt-1 uppercase">Enquiries Hub</h1>
           </div>
           <div className="flex items-center gap-4 w-full sm:w-auto">
             <button
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
           <div className="space-y-2 w-full lg:w-auto">
             <span className="text-[10px] uppercase tracking-[0.2em] text-black/50 block">Filter By Category</span>
             <div className="flex flex-wrap gap-2">
-              {["All", "ZeeSip", "Zee Chai", "Eallisto", "General"].map((cat) => (
+              {["All", "ZeeSip", "Zee Chai", "Eallisto", "Le Weekend", "Kinford School", "General"].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
@@ -264,7 +264,7 @@ export default function AdminDashboard() {
                     className="hover:bg-black/[0.02] cursor-pointer transition-colors group"
                   >
                     <td className="py-4 px-6">
-                      <span className="font-serif text-sm font-semibold border border-black/20 px-2.5 py-1 bg-black/5">
+                      <span className="font-heading text-xs font-bold border border-black/20 px-2.5 py-1 bg-black/5 uppercase">
                         {enquiry.category}
                       </span>
                     </td>
@@ -348,7 +348,7 @@ export default function AdminDashboard() {
                     
                     {/* Header Details */}
                     <div>
-                      <h2 className="font-serif text-3xl tracking-tight mb-2">
+                      <h2 className="font-heading font-bold text-3xl tracking-tight mb-2">
                         {selectedEnquiry.name}
                       </h2>
                       <div className="flex items-center gap-2 text-xs text-black/60 font-light">

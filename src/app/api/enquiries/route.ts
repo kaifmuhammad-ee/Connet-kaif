@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { query } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 
 export async function POST(request: Request) {
   try {
@@ -14,7 +14,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const categories = ["ZeeSip", "Zee Chai", "Eallisto", "General"];
+    const categories = [
+      "ZeeSip",
+      "Zee Chai",
+      "Eallisto",
+      "Le Weekend",
+      "Kinford School",
+      "General",
+    ];
     if (!categories.includes(category)) {
       return NextResponse.json(
         { error: "Invalid category selected." },
@@ -22,21 +29,36 @@ export async function POST(request: Request) {
       );
     }
 
-    // Insert enquiry
-    const sql = `
-      INSERT INTO enquiries (category, name, email, phone, place, message, status)
-      VALUES ($1, $2, $3, $4, $5, $6, 'New')
-      RETURNING *;
-    `;
-    const params = [category, name, email, phone, place, message];
-    const result = await query(sql, params);
+    // Insert enquiry using Supabase JS client
+    const { data, error } = await supabase
+      .from("enquiries")
+      .insert([
+        {
+          category,
+          name,
+          email,
+          phone,
+          place,
+          message,
+          status: "New",
+        },
+      ])
+      .select();
+
+    if (error) {
+      console.error("Supabase insert error details:", error);
+      return NextResponse.json(
+        { error: `Database insert failed: ${error.message || JSON.stringify(error)}` },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(
-      { success: true, enquiry: result.rows[0] },
+      { success: true, enquiry: data ? data[0] : null },
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("Error in POST /api/enquiries:", error);
+    console.error("Unexpected error in POST /api/enquiries:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
