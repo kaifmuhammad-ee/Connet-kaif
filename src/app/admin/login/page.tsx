@@ -65,7 +65,7 @@ export default function AdminLogin() {
           <div className="w-12 h-12 border border-black rounded-none flex items-center justify-center mx-auto mb-4 bg-black text-[#F5F0E6]">
             <Lock size={18} />
           </div>
-          <h1 className="font-heading font-black text-3xl tracking-tight uppercase">Admin Login</h1>
+          <h1 className="font-heading font-light text-3xl tracking-wide uppercase">Admin Login</h1>
           <p className="text-xs uppercase tracking-wider text-black/50 mt-2">
             Enter credentials to manage enquiries
           </p>

@@ -173,7 +173,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="font-heading font-black text-6xl sm:text-7xl md:text-9xl tracking-tighter leading-none mb-6 uppercase">
+            <h1 className="font-heading font-light text-6xl sm:text-7xl md:text-9xl tracking-normal leading-none mb-6 uppercase">
               Kaif Muhammad
             </h1>
           </motion.div>
@@ -187,7 +187,7 @@ export default function Home() {
             <p className="text-xs uppercase tracking-[0.3em] font-semibold bg-black text-[#F5F0E6] px-3 py-1 w-fit">
               Serial Entrepreneur
             </p>
-            <p className="font-heading text-lg sm:text-xl text-black/75 tracking-wide font-semibold">
+            <p className="font-heading text-base sm:text-lg text-black/70 tracking-widest font-light uppercase">
               Building the future across hospitality, luxury, and education.
             </p>
           </motion.div>
@@ -241,7 +241,7 @@ export default function Home() {
       >
         <div className="max-w-4xl mx-auto">
           <span className="text-xs uppercase tracking-[0.3em] opacity-60 block mb-6 font-semibold">01 / Biography</span>
-          <h2 className="font-heading font-black text-4xl sm:text-5xl md:text-6xl tracking-tight mb-8">
+          <h2 className="font-heading font-light text-4xl sm:text-5xl md:text-6xl tracking-wide mb-8">
             An editorial approach to multi-venture execution.
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm md:text-base opacity-80 leading-relaxed font-light">
@@ -268,7 +268,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-4">
             <div>
               <span className="text-xs uppercase tracking-[0.3em] text-black/60 block mb-3 font-semibold">02 / Portfolio</span>
-              <h2 className="font-heading font-black text-5xl md:text-6xl tracking-tight">Active Ventures</h2>
+              <h2 className="font-heading font-light text-5xl md:text-6xl tracking-wide">Active Ventures</h2>
             </div>
             <p className="text-sm text-black/60 max-w-sm">
               Click on any venture below to explore their official channels and websites.
@@ -285,7 +285,7 @@ export default function Home() {
                 className="group border border-black p-8 flex flex-col justify-between h-80 transition-all duration-500 hover:bg-black hover:text-[#F5F0E6] rounded-none relative overflow-hidden"
               >
                 <div className="flex justify-between items-start">
-                  <span className="font-heading text-2xl font-bold tracking-tight">
+                  <span className="font-heading text-xl sm:text-2xl font-light tracking-wide">
                     {item.name}
                   </span>
                   <div className="border border-black group-hover:border-[#F5F0E6] p-2 transition-colors">
@@ -315,7 +315,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <span className="text-xs uppercase tracking-[0.3em] opacity-60 block mb-3 font-semibold">03 / Communication</span>
-            <h2 className="font-heading font-black text-5xl md:text-6xl tracking-tight mb-4">Enquiry Hub</h2>
+            <h2 className="font-heading font-light text-5xl md:text-6xl tracking-wide mb-4">Enquiry Hub</h2>
             <p className="text-sm opacity-70 max-w-md mx-auto">
               Select the appropriate brand category below to submit a direct message to Kaif and his team.
             </p>
@@ -478,7 +478,7 @@ export default function Home() {
                   <div className="w-16 h-16 bg-[#F5F0E6] text-black rounded-full flex items-center justify-center mx-auto">
                     <Check size={28} />
                   </div>
-                  <h3 className="font-heading font-black text-3xl sm:text-4xl tracking-tight">Enquiry Received</h3>
+                  <h3 className="font-heading font-light text-3xl sm:text-4xl tracking-wide">Enquiry Received</h3>
                   <p className="text-sm opacity-70 max-w-md mx-auto leading-relaxed">
                     Thank you for reaching out. Your enquiry has been added to our dashboard. 
                     Kaif or a representative of the team will review the details and get back to you shortly.
@@ -502,7 +502,7 @@ export default function Home() {
         className="py-16 px-6 md:px-24 border-t border-black bg-[#F5F0E6] text-black flex flex-col md:flex-row justify-between items-center gap-8"
       >
         <div className="text-center md:text-left">
-          <span className="font-heading text-xl font-bold tracking-tight block">Kaif Muhammad</span>
+          <span className="font-heading text-lg font-light tracking-widest block uppercase">Kaif Muhammad</span>
           <span className="text-xs uppercase tracking-[0.2em] text-black/50 font-medium">© 2026. All Rights Reserved.</span>
         </div>
 

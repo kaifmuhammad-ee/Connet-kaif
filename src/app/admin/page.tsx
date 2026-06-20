@@ -154,7 +154,7 @@ export default function AdminDashboard() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-black pb-8 gap-4">
           <div>
             <span className="text-xs uppercase tracking-[0.2em] opacity-60">Admin Portal</span>
-            <h1 className="font-heading font-black text-4xl tracking-tight mt-1 uppercase">Enquiries Hub</h1>
+            <h1 className="font-heading font-light text-4xl tracking-wide mt-1 uppercase">Enquiries Hub</h1>
           </div>
           <div className="flex items-center gap-4 w-full sm:w-auto">
             <button
@@ -348,7 +348,7 @@ export default function AdminDashboard() {
                     
                     {/* Header Details */}
                     <div>
-                      <h2 className="font-heading font-bold text-3xl tracking-tight mb-2">
+                      <h2 className="font-heading font-light text-3xl tracking-wide mb-2">
                         {selectedEnquiry.name}
                       </h2>
                       <div className="flex items-center gap-2 text-xs text-black/60 font-light">
