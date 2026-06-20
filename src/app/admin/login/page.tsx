@@ -37,7 +37,7 @@ export default function AdminLogin() {
       } else {
         setError(data.error || "Invalid email or password.");
       }
-    } catch (_err) {
+    } catch {
       setError("An error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);

@@ -44,7 +44,7 @@ export default function AdminDashboard() {
           router.push("/admin/login");
         }
       }
-    } catch (err) {
+    } catch {
       setError("Network error. Failed to retrieve enquiries.");
     } finally {
       setIsLoading(false);
@@ -101,7 +101,7 @@ export default function AdminDashboard() {
       } else {
         alert(data.error || "Failed to update status.");
       }
-    } catch (err) {
+    } catch {
       alert("Network error. Could not update status.");
     } finally {
       setUpdatingId(null);
@@ -117,7 +117,7 @@ export default function AdminDashboard() {
         router.push("/admin/login");
         router.refresh();
       }
-    } catch (err) {
+    } catch {
       alert("Failed to logout.");
     }
   };

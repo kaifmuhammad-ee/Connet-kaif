@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { query } from "@/lib/db";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase";
 import { decrypt } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -34,49 +34,77 @@ export async function PATCH(
     }
 
     let updatedEnquiry = null;
+    let updated = false;
+    const errorsLog: string[] = [];
 
     // 3. Update enquiry status with database client fallback
     if (process.env.DATABASE_URL) {
-      console.log("Updating enquiry status via direct PostgreSQL connection pool.");
-      const sql = `
-        UPDATE enquiries
-        SET status = $1
-        WHERE id = $2
-        RETURNING *;
-      `;
-      const result = await query(sql, [status, id]);
-      if (result.rowCount === 0) {
-        return NextResponse.json({ error: "Enquiry not found." }, { status: 404 });
+      try {
+        console.log("Updating enquiry status via direct PostgreSQL connection pool.");
+        const sql = `
+          UPDATE enquiries
+          SET status = $1
+          WHERE id = $2
+          RETURNING *;
+        `;
+        const result = await query(sql, [status, id]);
+        if (result.rowCount === 0) {
+          return NextResponse.json({ error: "Enquiry not found." }, { status: 404 });
+        }
+        updatedEnquiry = result.rows[0];
+        updated = true;
+        console.log(`Successfully updated status via PostgreSQL connection.`);
+      } catch (dbError: any) {
+        const msg = `PostgreSQL update query failed: ${dbError.message || dbError}`;
+        console.error(msg, dbError);
+        errorsLog.push(msg);
       }
-      updatedEnquiry = result.rows[0];
-    } else {
-      console.log("Updating enquiry status via Supabase JS client.");
-      const { data, error } = await supabase
-        .from("enquiries")
-        .update({ status })
-        .eq("id", id)
-        .select();
+    }
 
-      if (error) {
-        console.error("Supabase update error details:", error);
-        return NextResponse.json(
-          { error: `Database update failed: ${error.message || JSON.stringify(error)}` },
-          { status: 500 }
-        );
-      }
+    if (!updated) {
+      try {
+        console.log("Updating enquiry status via Supabase Admin JS client.");
+        const supabaseAdmin = getSupabaseAdmin();
+        const { data, error } = await supabaseAdmin
+          .from("enquiries")
+          .update({ status })
+          .eq("id", id)
+          .select();
 
-      if (!data || data.length === 0) {
-        return NextResponse.json({ error: "Enquiry not found." }, { status: 404 });
+        if (error) {
+          console.error("Supabase Admin update error details:", error);
+          errorsLog.push(`Supabase update query failed: ${error.message || JSON.stringify(error)}`);
+        } else if (!data || data.length === 0) {
+          return NextResponse.json({ error: "Enquiry not found." }, { status: 404 });
+        } else {
+          updatedEnquiry = data[0];
+          updated = true;
+          console.log(`Successfully updated status via Supabase Admin Client.`);
+        }
+      } catch (sbError: any) {
+        const msg = `Supabase Admin update client instantiation/execution failed: ${sbError.message || sbError}`;
+        console.error(msg, sbError);
+        errorsLog.push(msg);
       }
-      updatedEnquiry = data[0];
+    }
+
+    if (!updated) {
+      return NextResponse.json(
+        {
+          error: "Database update failed completely.",
+          details: errorsLog.join(" | "),
+        },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ success: true, enquiry: updatedEnquiry });
   } catch (error: any) {
     console.error("Unexpected error in PATCH /api/admin/enquiries/[id]:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Internal Server Error", message: error.message || String(error) },
       { status: 500 }
     );
   }
 }
+

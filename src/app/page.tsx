@@ -138,7 +138,7 @@ export default function Home() {
       } else {
         setErrors({ submit: result.error || "Something went wrong. Please try again." });
       }
-    } catch (err) {
+    } catch {
       setErrors({ submit: "Network error. Please check your connection and try again." });
     } finally {
       setIsSubmitting(false);
