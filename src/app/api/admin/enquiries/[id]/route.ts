@@ -116,3 +116,101 @@ export async function PATCH(
   }
 }
 
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params;
+
+    // 1. Authenticate session
+    const cookieStore = cookies();
+    const sessionCookie = cookieStore.get("admin_session")?.value;
+    const session = sessionCookie ? await decrypt(sessionCookie) : null;
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    let deleted = false;
+    const errorsLog: string[] = [];
+
+    // 2. Delete enquiry with database client fallback
+    if (process.env.DATABASE_URL) {
+      try {
+        console.log("Deleting enquiry via direct PostgreSQL connection pool.");
+        const sql = `
+          DELETE FROM enquiries
+          WHERE id = $1
+          RETURNING *;
+        `;
+        const result = await query(sql, [id]);
+        if (result.rowCount === 0) {
+          return NextResponse.json({ error: "Enquiry not found." }, { status: 404 });
+        }
+        deleted = true;
+        console.log(`Successfully deleted enquiry via PostgreSQL connection.`);
+      } catch (dbError: any) {
+        const msg = `PostgreSQL delete query failed: ${dbError.message || dbError}`;
+        console.error(msg, dbError);
+        errorsLog.push(msg);
+      }
+    }
+
+    if (!deleted) {
+      try {
+        console.log("Deleting enquiry via Supabase Admin JS client.");
+        const supabaseAdmin = getSupabaseAdmin();
+        
+        console.log(`DEBUG: Executing Supabase Admin DELETE query for ID: ${id}...`);
+        
+        const { data, error } = await supabaseAdmin
+          .from("enquiries")
+          .delete()
+          .eq("id", id)
+          .select();
+
+        console.log("DEBUG: Supabase Admin DELETE query finished. Raw Response:", {
+          hasData: !!data,
+          dataLength: data ? data.length : null,
+          deletedRow: data ? data[0] : null,
+          error: error ? { message: error.message, details: error.details, hint: error.hint, code: error.code } : null
+        });
+
+        if (error) {
+          console.error("Supabase Admin delete error details:", error);
+          errorsLog.push(`Supabase delete query failed: ${error.message || JSON.stringify(error)}`);
+        } else if (!data || data.length === 0) {
+          return NextResponse.json({ error: "Enquiry not found or already deleted." }, { status: 404 });
+        } else {
+          deleted = true;
+          console.log(`Successfully deleted enquiry via Supabase Admin Client.`);
+        }
+      } catch (sbError: any) {
+        const msg = `Supabase Admin delete client instantiation/execution failed: ${sbError.message || sbError}`;
+        console.error(msg, sbError);
+        errorsLog.push(msg);
+      }
+    }
+
+    if (!deleted) {
+      return NextResponse.json(
+        {
+          error: "Database delete failed completely.",
+          details: errorsLog.join(" | "),
+        },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("Unexpected error in DELETE /api/admin/enquiries/[id]:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error", message: error.message || String(error) },
+      { status: 500 }
+    );
+  }
+}
+
+

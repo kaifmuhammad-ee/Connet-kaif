@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, RefreshCw, X, Calendar, MapPin, Mail, Phone, Tag } from "lucide-react";
+import { LogOut, RefreshCw, X, Calendar, MapPin, Mail, Phone, Tag, Trash2 } from "lucide-react";
 
 interface Enquiry {
   id: string;
@@ -27,6 +27,9 @@ export default function AdminDashboard() {
   const [sortBy, setSortBy] = useState("newest"); // newest, oldest
   const [selectedEnquiry, setSelectedEnquiry] = useState<Enquiry | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [enquiryIdToDelete, setEnquiryIdToDelete] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -105,6 +108,40 @@ export default function AdminDashboard() {
       alert("Network error. Could not update status.");
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setEnquiryIdToDelete(id);
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!enquiryIdToDelete) return;
+    setDeletingId(enquiryIdToDelete);
+    setShowConfirmModal(false);
+    
+    try {
+      const response = await fetch(`/api/admin/enquiries/${enquiryIdToDelete}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        // Update local state
+        setEnquiries((prev) => prev.filter((e) => e.id !== enquiryIdToDelete));
+        // Close detail drawer if the deleted enquiry is currently open
+        if (selectedEnquiry && selectedEnquiry.id === enquiryIdToDelete) {
+          setSelectedEnquiry(null);
+        }
+      } else {
+        alert(data.error || "Failed to delete enquiry.");
+      }
+    } catch {
+      alert("Network error. Could not delete enquiry.");
+    } finally {
+      setDeletingId(null);
+      setEnquiryIdToDelete(null);
     }
   };
 
@@ -254,6 +291,7 @@ export default function AdminDashboard() {
                   <th className="py-4 px-6 font-semibold">Message Preview</th>
                   <th className="py-4 px-6 font-semibold">Date</th>
                   <th className="py-4 px-6 font-semibold">Status</th>
+                  <th className="py-4 px-6 font-semibold text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-black/10">
@@ -299,6 +337,19 @@ export default function AdminDashboard() {
                         <option value="Replied">Replied</option>
                         <option value="Closed">Closed</option>
                       </select>
+                    </td>
+                    <td 
+                      className="py-4 px-6 text-right"
+                      onClick={(e) => e.stopPropagation()} // Prevent modal trigger on click
+                    >
+                      <button
+                        onClick={() => handleDeleteClick(enquiry.id)}
+                        disabled={deletingId === enquiry.id}
+                        className="text-black/40 hover:text-red-600 transition-colors p-1.5"
+                        title="Delete Enquiry"
+                      >
+                        <Trash2 size={16} className={deletingId === enquiry.id ? "opacity-35" : ""} />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -423,10 +474,16 @@ export default function AdminDashboard() {
                 <div className="border-t border-black/10 pt-6 mt-8 flex flex-col sm:flex-row gap-4">
                   <a
                     href={`mailto:${selectedEnquiry.email}?subject=Re: Enquiry regarding ${selectedEnquiry.category}`}
-                    className="flex-1 bg-black text-[#F5F0E6] text-center uppercase tracking-wider text-xs py-4 hover:bg-[#F5F0E6] hover:text-black border border-black transition-colors font-semibold"
+                    className="flex-1 bg-black text-[#F5F0E6] text-center uppercase tracking-wider text-xs py-4 hover:bg-[#F5F0E6] hover:text-black border border-black transition-colors font-semibold flex items-center justify-center"
                   >
                     Reply via Email
                   </a>
+                  <button
+                    onClick={() => handleDeleteClick(selectedEnquiry.id)}
+                    className="flex-1 border border-red-600 text-red-600 text-center uppercase tracking-wider text-xs py-4 hover:bg-red-600 hover:text-white transition-colors font-semibold"
+                  >
+                    Delete Enquiry
+                  </button>
                   <button
                     onClick={() => setSelectedEnquiry(null)}
                     className="flex-1 border border-black text-center uppercase tracking-wider text-xs py-4 hover:bg-black hover:text-[#F5F0E6] transition-colors"
@@ -435,6 +492,52 @@ export default function AdminDashboard() {
                   </button>
                 </div>
 
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Custom Confirmation Modal */}
+        <AnimatePresence>
+          {showConfirmModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowConfirmModal(false)}
+                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              />
+
+              {/* Modal Card */}
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="relative bg-[#F5F0E6] border border-black p-8 max-w-md w-full space-y-6 shadow-xl"
+              >
+                <div>
+                  <h3 className="font-heading font-light text-2xl tracking-wide uppercase">Confirm Deletion</h3>
+                  <p className="text-sm text-black/70 mt-2 leading-relaxed">
+                    Are you sure you want to permanently delete this enquiry? This action cannot be undone.
+                  </p>
+                </div>
+
+                <div className="flex gap-4">
+                  <button
+                    onClick={handleConfirmDelete}
+                    className="flex-1 bg-black text-[#F5F0E6] border border-black py-3 text-xs uppercase tracking-widest font-semibold hover:bg-[#F5F0E6] hover:text-black transition-colors"
+                  >
+                    Yes, Delete
+                  </button>
+                  <button
+                    onClick={() => setShowConfirmModal(false)}
+                    className="flex-1 border border-black py-3 text-xs uppercase tracking-widest font-semibold hover:bg-black hover:text-[#F5F0E6] transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </motion.div>
             </div>
           )}
