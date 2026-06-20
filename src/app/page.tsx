@@ -8,7 +8,7 @@ const VENTURES = [
   {
     name: "Zee Chai",
     description: "Premium chai lounges bringing a modern, warm tea experience.",
-    url: "https://zeechai.in",
+    url: "https://zechai.in",
   },
   {
     name: "ZeeSip",
@@ -27,7 +27,7 @@ const VENTURES = [
   },
   {
     name: "Le Weekend",
-    description: "Curated weekend getaways, boutique travel, and experiences.",
+    description: "Premium innerwear label redefining comfort and design.",
     url: "https://leweekend.in",
   },
 ];
@@ -252,7 +252,7 @@ export default function Home() {
             </p>
             <p>
               Beyond hospitality, Kaif leads Eallisto, a curated luxury design venture, as well as educational 
-              initiatives like Kinford School and leisure platforms like Le Weekend. He continues to launch 
+              initiatives like Kinford School and consumer labels like Le Weekend. He continues to launch 
               disruptive brands, ensuring each is run by a dedicated operational team.
             </p>
           </div>
