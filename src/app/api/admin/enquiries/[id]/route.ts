@@ -65,11 +65,19 @@ export async function PATCH(
       try {
         console.log("Updating enquiry status via Supabase Admin JS client.");
         const supabaseAdmin = getSupabaseAdmin();
+        console.log(`DEBUG: Executing Supabase Admin UPDATE query for ID: ${id}...`);
         const { data, error } = await supabaseAdmin
           .from("enquiries")
           .update({ status })
           .eq("id", id)
           .select();
+
+        console.log("DEBUG: Supabase Admin UPDATE query finished. Raw Response:", {
+          hasData: !!data,
+          dataLength: data ? data.length : null,
+          updatedRow: data ? data[0] : null,
+          error: error ? { message: error.message, details: error.details, hint: error.hint, code: error.code } : null
+        });
 
         if (error) {
           console.error("Supabase Admin update error details:", error);

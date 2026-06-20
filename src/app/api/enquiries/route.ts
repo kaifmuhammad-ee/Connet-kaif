@@ -30,6 +30,7 @@ export async function POST(request: Request) {
     }
 
     // Insert enquiry using Supabase JS client
+    console.log("DEBUG: Executing public Supabase INSERT query...");
     const { error } = await supabase
       .from("enquiries")
       .insert([
@@ -43,6 +44,8 @@ export async function POST(request: Request) {
           status: "New",
         },
       ]);
+
+    console.log("DEBUG: Public Supabase INSERT finished. Error:", error ? { message: error.message, details: error.details, hint: error.hint, code: error.code } : null);
 
     if (error) {
       console.error("Supabase insert error details:", error);

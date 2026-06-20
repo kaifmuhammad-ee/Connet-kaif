@@ -43,12 +43,18 @@ export async function GET() {
 
     if (!fetched) {
       try {
-        console.log("Fetching enquiries via Supabase Admin JS client.");
+        console.log("DEBUG: Executing Supabase Admin SELECT query...");
         const supabaseAdmin = getSupabaseAdmin();
         const { data, error } = await supabaseAdmin
           .from("enquiries")
           .select("*")
           .order("created_at", { ascending: false });
+
+        console.log("DEBUG: Supabase Admin SELECT query finished. Raw Response:", {
+          hasData: !!data,
+          dataLength: data ? data.length : null,
+          error: error ? { message: error.message, details: error.details, hint: error.hint, code: error.code } : null
+        });
 
         if (error) {
           console.error("Supabase Admin select error details:", error);
