@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { query } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
 import { decrypt } from "@/lib/session";
 
@@ -32,26 +33,45 @@ export async function PATCH(
       );
     }
 
-    // 3. Update enquiry status via Supabase client
-    const { data, error } = await supabase
-      .from("enquiries")
-      .update({ status })
-      .eq("id", id)
-      .select();
+    let updatedEnquiry = null;
 
-    if (error) {
-      console.error("Supabase update error details:", error);
-      return NextResponse.json(
-        { error: `Database update failed: ${error.message || JSON.stringify(error)}` },
-        { status: 500 }
-      );
+    // 3. Update enquiry status with database client fallback
+    if (process.env.DATABASE_URL) {
+      console.log("Updating enquiry status via direct PostgreSQL connection pool.");
+      const sql = `
+        UPDATE enquiries
+        SET status = $1
+        WHERE id = $2
+        RETURNING *;
+      `;
+      const result = await query(sql, [status, id]);
+      if (result.rowCount === 0) {
+        return NextResponse.json({ error: "Enquiry not found." }, { status: 404 });
+      }
+      updatedEnquiry = result.rows[0];
+    } else {
+      console.log("Updating enquiry status via Supabase JS client.");
+      const { data, error } = await supabase
+        .from("enquiries")
+        .update({ status })
+        .eq("id", id)
+        .select();
+
+      if (error) {
+        console.error("Supabase update error details:", error);
+        return NextResponse.json(
+          { error: `Database update failed: ${error.message || JSON.stringify(error)}` },
+          { status: 500 }
+        );
+      }
+
+      if (!data || data.length === 0) {
+        return NextResponse.json({ error: "Enquiry not found." }, { status: 404 });
+      }
+      updatedEnquiry = data[0];
     }
 
-    if (!data || data.length === 0) {
-      return NextResponse.json({ error: "Enquiry not found." }, { status: 404 });
-    }
-
-    return NextResponse.json({ success: true, enquiry: data[0] });
+    return NextResponse.json({ success: true, enquiry: updatedEnquiry });
   } catch (error: any) {
     console.error("Unexpected error in PATCH /api/admin/enquiries/[id]:", error);
     return NextResponse.json(

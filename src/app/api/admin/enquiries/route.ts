@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { query } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
 import { decrypt } from "@/lib/session";
 
@@ -16,21 +17,37 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 2. Fetch enquiries from database via Supabase client
-    const { data, error } = await supabase
-      .from("enquiries")
-      .select("*")
-      .order("created_at", { ascending: false });
+    let enquiries = [];
 
-    if (error) {
-      console.error("Supabase select error details:", error);
-      return NextResponse.json(
-        { error: `Database fetch failed: ${error.message || JSON.stringify(error)}` },
-        { status: 500 }
-      );
+    // 2. Fetch enquiries with database client fallback
+    if (process.env.DATABASE_URL) {
+      console.log("Fetching enquiries via direct PostgreSQL connection pool.");
+      const sql = `
+        SELECT id, category, name, email, phone, place, message, status, created_at
+        FROM enquiries
+        ORDER BY created_at DESC;
+      `;
+      const result = await query(sql);
+      enquiries = result.rows;
+    } else {
+      console.log("Fetching enquiries via Supabase JS client.");
+      const { data, error } = await supabase
+        .from("enquiries")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Supabase select error details:", error);
+        return NextResponse.json(
+          { error: `Database fetch failed: ${error.message || JSON.stringify(error)}` },
+          { status: 500 }
+        );
+      }
+      enquiries = data || [];
     }
 
-    return NextResponse.json({ success: true, enquiries: data || [] });
+    console.log(`Successfully fetched ${enquiries.length} enquiries.`);
+    return NextResponse.json({ success: true, enquiries });
   } catch (error: any) {
     console.error("Unexpected error in GET /api/admin/enquiries:", error);
     return NextResponse.json(
